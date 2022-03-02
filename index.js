@@ -7,6 +7,7 @@ const client = new Discord.Client({
  });
 
 const { prefix, token } = require('./config.json');
+const { handleGameReaction } = require('./reaction-handling');
 
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
@@ -18,16 +19,12 @@ commandFiles.forEach((file) => {
 
 client.once('ready', () => {
     console.log("Ohayobot online");
-    //client.channels.get(945760249019789354).fetchMessage(945765531460452402)
 });
 
 client.on('messageCreate', message => {
     const args = message.content.slice(prefix.length).split(/ +/);
     const commandName = args.shift().toLowerCase();
     const command = client.commands.get(commandName);
-
-    console.log("channelId: ", message.channelId);
-    console.log("messageId: ", message.id);
     
     if (!client.commands.has(commandName)) return;
     if(message.channel.name == undefined) {
@@ -51,7 +48,7 @@ client.on('messageCreate', message => {
     }
 });
 
-client.on('messageReactionAdd', async (reaction, user) => {
+client.on('messageReactionAdd', async (reaction) => {
     if(reaction.partial) {
         try {
             await reaction.fetch();
@@ -62,9 +59,9 @@ client.on('messageReactionAdd', async (reaction, user) => {
         }
     }
 
+    // This is a hard coded message ID of the message we want to use
     if(reaction.message.id == 945765531460452402) {
-        console.log('hit')
-        console.log(reaction);
+        handleGameReaction(reaction);
     }
 });
 
