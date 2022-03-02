@@ -25,7 +25,7 @@ const addNewGame = async (reaction) => {
     const gameRole = await addGameRole(reaction.message.guild.roles);
     const gameCategory = await addGameCategory(reaction.emoji.name, reaction.message.guild, gameRole);
     const gameTextChannel = await addGameTextChannels(reaction.emoji.name, reaction.message.guild, gameCategory);
-    const gameVoiceChannel = await addGameVoiceChannels(reaction.emoji.name, reaction.message.guild, gameCategory);
+    await addGameVoiceChannels(reaction.emoji.name, reaction.message.guild, gameCategory);
     await sendWelcomeMessage(gameTextChannel, reaction.message.author);
 
     return gameRole;

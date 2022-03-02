@@ -22,8 +22,11 @@ client.once('ready', () => {
 });
 
 client.on('messageCreate', message => {
-    const args = message.content.slice(prefix.length).split(/ +/);
-    const commandName = args.shift().toLowerCase();
+    let args = message.content.slice(prefix.length).split(/"+/);
+
+    args = args.filter(arg => arg !== '');
+
+    const commandName = args.shift().trim().toLowerCase();
     const command = client.commands.get(commandName);
     
     if (!client.commands.has(commandName)) return;
