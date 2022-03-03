@@ -7,7 +7,7 @@ const client = new Discord.Client({
  });
 
 const { prefix, token } = require('./config.json');
-const { handleGameReaction } = require('./reaction-handling');
+const { handleGameReaction, handleGameReactionRemoval } = require('./reaction-handling');
 
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
@@ -62,6 +62,22 @@ client.on('messageReactionAdd', async (reaction) => {
     // This is a hard coded message ID of the message we want to use
     if(reaction.message.id == 945765531460452402) {
         handleGameReaction(reaction);
+    }
+});
+
+client.on('messageReactionRemove', async (reaction) => {
+    if(reaction.partial) {
+        try {
+            await reaction.fetch();
+        }
+        catch(ex) {
+            console.error("Something went wrong", error);
+            return
+        }
+    }
+
+    if(reaction.message.id == 945765531460452402) {
+        handleGameReactionRemoval(reaction);
     }
 });
 

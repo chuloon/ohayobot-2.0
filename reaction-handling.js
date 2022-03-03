@@ -21,6 +21,12 @@ const handleGameReaction = async (reaction) => {
     }
 }
 
+const handleGameReactionRemoval = async (reaction) => {
+    const emojiName = reaction.emoji.name;
+    const gameRole = reaction.message.guild.roles.cache.filter(role => role.name == emojiName).first();
+    reaction.message.member.roles.remove(gameRole);
+}
+
 const addNewGame = async (reaction) => {
     const gameRole = await addGameRole(reaction.message.guild.roles);
     const gameCategory = await addGameCategory(reaction.emoji.name, reaction.message.guild, gameRole);
@@ -82,4 +88,4 @@ const doesRoleExist = (roleName, serverRoles) => {
     return filteredArray.length > 0
 }
 
-module.exports = { handleGameReaction };
+module.exports = { handleGameReaction, handleGameReactionRemoval };
