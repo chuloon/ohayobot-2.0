@@ -80,7 +80,7 @@ client.on('messageReactionRemove', async (reaction) => {
     }
 
     if(reaction.message.id == 945765531460452402) {
-        handleGameReactionRemoval(reaction);
+        await handleGameReactionRemoval(reaction);
     }
 });
 

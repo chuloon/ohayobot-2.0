@@ -5,26 +5,28 @@ const handleGameReaction = async (reaction) => {
         for(let i = 0; i < validGames.length; i++) {
             if(emojiName == validGames[i]) {
                 const serverRoles = reaction.message.guild.roles.cache;
-                let gameRole;
+                let gameData = {};
                 if(!doesRoleExist(emojiName, serverRoles)) {
-                    gameRole = await addNewGame(reaction);
+                    gameData = await addNewGame(reaction);
                 }
                 else {
-                    gameRole = reaction.message.guild.roles.cache.filter(role => role.name == emojiName).first();
+                    gameData.gameRole = reaction.message.guild.roles.cache.filter(role => role.name == emojiName).first();
+                    gameData.gameTextChannel = reaction.message.guild.channels.cache.filter(channel => channel.name === `${emojiName}-chat`).first();
                 }
-                reaction.message.member.roles.add(gameRole);
+                reaction.message.member.roles.add(gameData.gameRole);
+                await sendWelcomeMessage(gameData.gameTextChannel, reaction.message.author);
             }
         }
     }
     else {
-        reaction.remove();
+        await reaction.remove();
     }
 }
 
 const handleGameReactionRemoval = async (reaction) => {
     const emojiName = reaction.emoji.name;
     const gameRole = reaction.message.guild.roles.cache.filter(role => role.name == emojiName).first();
-    reaction.message.member.roles.remove(gameRole);
+    await reaction.message.member.roles.remove(gameRole);
 }
 
 const addNewGame = async (reaction) => {
@@ -32,9 +34,14 @@ const addNewGame = async (reaction) => {
     const gameCategory = await addGameCategory(reaction.emoji.name, reaction.message.guild, gameRole);
     const gameTextChannel = await addGameTextChannels(reaction.emoji.name, reaction.message.guild, gameCategory);
     await addGameVoiceChannels(reaction.emoji.name, reaction.message.guild, gameCategory);
-    await sendWelcomeMessage(gameTextChannel, reaction.message.author);
+    
 
-    return gameRole;
+    const gameData = {
+        gameRole: gameRole,
+        gameTextChannel: gameTextChannel
+    }
+
+    return gameData;
 }
 
 const addGameRole = async (roles) => {
@@ -78,7 +85,7 @@ const addGameVoiceChannels = async (name, guild, gameCategory) => {
 }
 
 const sendWelcomeMessage = async (gameTextChannel, author) => {
-    return await gameTextChannel.send(`Welcome to <#${gameTextChannel.id}>, <@${author.id}>, let's play a game!`)
+    return await gameTextChannel.send(`Welcome, <@${author.id}>, let's play a game!`)
 }
 
 const doesRoleExist = (roleName, serverRoles) => {
